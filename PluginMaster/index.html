@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PluginMaster - TC 伺服器 Dalamud擴充套件目錄</title>
-  <meta name="description" content="瀏覽與搜尋 TC 伺服器收錄的所有 FFXIV Dalamud擴充套件資訊、版本與更新日誌（當前支援 API Level 13）。">
+  <meta name="description" content="瀏覽與搜尋 TC 伺服器收錄的所有 FFXIV Dalamud擴充套件資訊、版本與更新日誌。">
   <!-- Google Fonts: Inter & Outfit -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,6 +12,25 @@
   <!-- Remixicon for modern icons -->
   <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <style data-styled="true" data-styled-version="5.3.3">
+    .eDynhg {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 40px;
+      padding: 6px 16px;
+      backdrop-filter: blur(20px);
+      border-radius: 12px;
+      color: white;
+      text-decoration: none !important;
+      transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.25s ease;
+    }
+    .eDynhg:hover {
+      text-decoration: none !important;
+      transform: translateY(-2px);
+    }
+  </style>
 </head>
 <body>
 
@@ -54,7 +73,7 @@
         </div>
         <div class="stat-card stat-api">
           <span class="stat-value" id="stat-api13">--</span>
-          <span class="stat-label">當前 API 13 擴充套件</span>
+          <span class="stat-label">API 13 擴充套件</span>
         </div>
       </div>
     </header>
@@ -74,15 +93,17 @@
 
     <!-- Repo URL Copy Card -->
     <section class="repo-url-card">
-      <div class="repo-url-header">
-        <i class="ri-link-m repo-url-icon"></i>
-        <span>Dalamud 擴充套件庫訂閱網址 (可在遊戲內 Dalamud 增設倉庫處貼上)</span>
-      </div>
-      <div class="repo-url-input-group">
-        <input type="text" id="repo-url-input" readonly value="載入中..." onclick="this.select()">
-        <button class="btn btn-primary" id="copy-repo-url-btn">
-          <i class="ri-file-copy-line"></i> 複製訂閱網址
-        </button>
+      <div class="repo-url-main">
+        <div class="repo-url-header">
+          <i class="ri-link-m repo-url-icon"></i>
+          <span>Dalamud 擴充套件庫訂閱網址 (可在遊戲內 Dalamud 增設倉庫處貼上)</span>
+        </div>
+        <div class="repo-url-input-group">
+          <input type="text" id="repo-url-input" readonly value="載入中..." onclick="this.select()">
+          <button class="btn btn-primary" id="copy-repo-url-btn">
+            <i class="ri-file-copy-line"></i> 複製訂閱網址
+          </button>
+        </div>
       </div>
     </section>
 
@@ -108,7 +129,7 @@
             <i class="ri-code-s-slash-line select-icon"></i>
             <select id="api-filter">
               <option value="all">所有 API Level</option>
-              <option value="13">API Level 13 (當前)</option>
+              <option value="13">API Level 13</option>
               <option value="12">API Level 12</option>
               <option value="11">API Level 11</option>
               <option value="10">API Level 10</option>
@@ -156,10 +177,38 @@
 
     <!-- Footer -->
     <footer class="app-footer">
-      <p>PluginMaster Web Directory &copy; 2026 Dalamud Plugin Distribution Project</p>
+      <p>PluginMaster Web Directory &copy; 2026 Dalamud Plugin Distribution Project (For TC 伺服器)</p>
       <p class="footer-note">最後資料同步更新於專案 PluginMaster/repo.json 檔案</p>
     </footer>
 
+  </div>
+
+  <!-- Vertical Collapsible Floating Sponsor Card (Boba Straw Cup SVG Icon Tab) -->
+  <div class="floating-sponsor-card-v">
+    <div class="sponsor-peek-tab">
+      <svg class="peek-boba-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <!-- Straw -->
+        <path d="M15 2L12 8" stroke="#F8E0BE" stroke-width="2"/>
+        <!-- Lid -->
+        <rect x="4.5" y="8" width="15" height="2.5" rx="1" fill="#C07C62" stroke="#F8E0BE" stroke-width="1.2"/>
+        <!-- Cup body -->
+        <path d="M6 10.5L7.5 21C7.6 21.6 8.1 22 8.7 22H15.3C15.9 22 16.4 21.6 16.5 21L18 10.5" stroke="#F8E0BE" stroke-width="1.8"/>
+        <!-- Drink Level -->
+        <line x1="6.8" y1="14" x2="17.2" y2="14" stroke="rgba(248, 224, 190, 0.4)" stroke-dasharray="2 2" stroke-width="1.2"/>
+        <!-- Boba pearls -->
+        <circle cx="9.5" cy="17.5" r="1.3" fill="#F8E0BE"/>
+        <circle cx="14.5" cy="17" r="1.3" fill="#F8E0BE"/>
+        <circle cx="12" cy="19.5" r="1.3" fill="#F8E0BE"/>
+      </svg>
+      <span class="peek-dot"></span>
+    </div>
+    <div class="sponsor-card-content">
+      <div class="sponsor-card-text">如果您喜歡這個專案，您可以</div>
+      <a href="https://plusone.bobaboba.me" target="_blank" class="sc-1ykasxb-0 eDynhg boba-sponsor-btn-ab" title="支持作者請喝珍奶">
+        <img height="20" src="https://s3.ap-southeast-1.amazonaws.com/media.anyonelab.com/images/boba/boba-embed-icon.png" alt="boba-icon"/>
+        <div style="flex:1;text-align:center;font-weight:600;font-size:0.85rem;">請我喝珍奶！</div>
+      </a>
+    </div>
   </div>
 
   <!-- Plugin Detail Modal -->
