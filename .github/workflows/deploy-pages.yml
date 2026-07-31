@@ -3,8 +3,7 @@ name: Deploy PluginMaster to GitHub Pages
 on:
   push:
     branches:
-      - main
-      - master
+      - tc/main
   workflow_dispatch:
 
 # Allow GITHUB_TOKEN to deploy to GitHub Pages
