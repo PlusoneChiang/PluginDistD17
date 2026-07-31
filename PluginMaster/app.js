@@ -27,6 +27,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const statTesting = document.getElementById('stat-testing');
   const statApi13 = document.getElementById('stat-api13');
 
+  // Metadata Banner Elements
+  const metaDistHash = document.getElementById('meta-dist-hash');
+  const metaDistDate = document.getElementById('meta-dist-date');
+  const metaCommitHash = document.getElementById('meta-commit-hash');
+
+  // Repo Subscription URL Elements
+  const repoUrlInput = document.getElementById('repo-url-input');
+  const copyRepoUrlBtn = document.getElementById('copy-repo-url-btn');
+
   // Modal Elements
   const detailModal = document.getElementById('detail-modal');
   const modalCloseBtn = document.getElementById('modal-close-btn');
@@ -44,7 +53,57 @@ document.addEventListener('DOMContentLoaded', () => {
   const modalApiLevel = document.getElementById('modal-api-level');
   const modalUpdated = document.getElementById('modal-updated');
   const modalRepoBtn = document.getElementById('modal-repo-btn');
-  const modalCopyLink = document.getElementById('modal-copy-link');
+  const modalDownloadBtn = document.getElementById('modal-download-btn');
+
+  // Initialize Repo URL Subscription Box
+  const repoJsonUrl = new URL('./repo.json', window.location.href).href;
+  if (repoUrlInput) {
+    repoUrlInput.value = repoJsonUrl;
+  }
+
+  if (copyRepoUrlBtn) {
+    copyRepoUrlBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText(repoJsonUrl).then(() => {
+        const origHTML = copyRepoUrlBtn.innerHTML;
+        copyRepoUrlBtn.innerHTML = '<i class="ri-check-line"></i> 已複製網址！';
+        copyRepoUrlBtn.classList.add('copied');
+        setTimeout(() => {
+          copyRepoUrlBtn.innerHTML = origHTML;
+          copyRepoUrlBtn.classList.remove('copied');
+        }, 2000);
+      });
+    });
+  }
+
+  // Fetch Meta Data
+  async function loadMetaData() {
+    try {
+      const response = await fetch('./meta.json');
+      if (!response.ok) return;
+      const meta = await response.json();
+      
+      if (meta.upstream_dist_hash) {
+        metaDistHash.textContent = meta.upstream_dist_hash.substring(0, 8);
+        metaDistHash.title = meta.upstream_dist_hash;
+      } else {
+        metaDistHash.textContent = 'N/A';
+      }
+
+      if (meta.upstream_dist_date) {
+        const d = new Date(meta.upstream_dist_date);
+        metaDistDate.textContent = isNaN(d.getTime()) ? meta.upstream_dist_date.split(' ')[0] : d.toLocaleDateString('zh-TW');
+      } else {
+        metaDistDate.textContent = '未知日期';
+      }
+
+      if (meta.commit_hash) {
+        metaCommitHash.textContent = meta.commit_hash;
+        metaCommitHash.title = meta.commit_full || meta.commit_hash;
+      }
+    } catch (e) {
+      console.warn('Could not load meta.json:', e);
+    }
+  }
 
   // Fetch Plugin Data from repo.json
   async function loadPluginData() {
@@ -61,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="empty-state">
           <i class="ri-error-warning-line empty-icon" style="color: #ef4444;"></i>
           <h3>無法載入 repo.json</h3>
-          <p>請確認是否已執行 ./generate_repo.sh 產生最新套件資料庫。</p>
+          <p>請確認是否已執行 ./generate_repo.sh 產生最新 Dalamud擴充套件資料庫。</p>
         </div>
       `;
     }
@@ -274,7 +333,7 @@ document.addEventListener('DOMContentLoaded', () => {
     modalName.textContent = plugin.Name || plugin.InternalName;
     modalAuthor.querySelector('span').textContent = plugin.Author || '社群貢獻者';
     modalPunchline.textContent = plugin.Punchline || '';
-    modalDescription.textContent = plugin.Description || '尚無套件描述細節。';
+    modalDescription.textContent = plugin.Description || '尚無 Dalamud擴充套件描述細節。';
     modalInternalName.textContent = plugin.InternalName;
     modalVersion.textContent = plugin.AssemblyVersion || plugin.TestingAssemblyVersion || '1.0.0.0';
     
@@ -320,15 +379,17 @@ document.addEventListener('DOMContentLoaded', () => {
       modalRepoBtn.classList.add('hidden');
     }
 
-    // Copy JSON Link
-    modalCopyLink.onclick = () => {
-      const jsonSnippet = JSON.stringify(plugin, null, 2);
-      navigator.clipboard.writeText(jsonSnippet).then(() => {
-        const originalText = modalCopyLink.innerHTML;
-        modalCopyLink.innerHTML = `<i class="ri-check-line"></i> 已複製套件資訊！`;
-        setTimeout(() => { modalCopyLink.innerHTML = originalText; }, 2000);
-      });
-    };
+    // Download Button Link
+    const downloadUrl = plugin.IsTestingExclusive ? 
+      (plugin.DownloadLinkTesting || plugin.DownloadLinkInstall) : 
+      (plugin.DownloadLinkInstall || plugin.DownloadLinkUpdate);
+      
+    if (downloadUrl) {
+      modalDownloadBtn.href = downloadUrl;
+      modalDownloadBtn.classList.remove('hidden');
+    } else {
+      modalDownloadBtn.classList.add('hidden');
+    }
 
     detailModal.classList.remove('hidden');
   }
@@ -346,5 +407,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Initialize
+  loadMetaData();
   loadPluginData();
 });

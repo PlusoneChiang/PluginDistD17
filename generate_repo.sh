@@ -3,7 +3,8 @@
 # generate_repo.sh
 #
 # POSIX Shell script to scan stable/ and testing-live/ plugin directories along
-# with state.json, and generate PluginMaster/repo.json for GitHub Pages.
+# with state.json, and generate PluginMaster/repo.json and PluginMaster/meta.json
+# for GitHub Pages.
 #
 # Requirements: jq (pre-installed on macOS / Linux)
 # Usage: ./generate_repo.sh
@@ -15,6 +16,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 STATE_FILE="$SCRIPT_DIR/state.json"
 OUTPUT_DIR="$SCRIPT_DIR/PluginMaster"
 OUTPUT_FILE="$OUTPUT_DIR/repo.json"
+META_FILE="$OUTPUT_DIR/meta.json"
 
 mkdir -p "$OUTPUT_DIR"
 
@@ -33,7 +35,25 @@ if [ -z "$JSON_FILES" ]; then
   exit 0
 fi
 
-# Execute single-pass jq aggregation
+# Extract git commit metadata
+GIT_COMMIT_HASH=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+GIT_COMMIT_FULL=$(git rev-parse HEAD 2>/dev/null || echo "unknown")
+GIT_COMMIT_DATE=$(git log -1 --format="%ci" 2>/dev/null || echo "unknown")
+DIST_COMMIT=$(git log --grep="Update distribute" -1 --format="%s" 2>/dev/null | grep -oE "[0-9a-f]{40}" || echo "")
+DIST_DATE=$(git log --grep="Update distribute" -1 --format="%ci" 2>/dev/null || echo "")
+
+# Generate meta.json
+cat <<EOF > "$META_FILE"
+{
+  "commit_hash": "$GIT_COMMIT_HASH",
+  "commit_full": "$GIT_COMMIT_FULL",
+  "commit_date": "$GIT_COMMIT_DATE",
+  "upstream_dist_hash": "$DIST_COMMIT",
+  "upstream_dist_date": "$DIST_DATE"
+}
+EOF
+
+# Execute single-pass jq aggregation for repo.json
 jq -s '
   def parse_ts(str):
     if str == null then 0
@@ -116,3 +136,4 @@ jq -s '
 
 COUNT=$(jq 'length' "$OUTPUT_FILE")
 echo "Successfully generated $OUTPUT_FILE with $COUNT plugins."
+echo "Generated $META_FILE with commit metadata."

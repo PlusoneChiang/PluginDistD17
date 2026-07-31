@@ -90,7 +90,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 2rem;
-  margin-bottom: 2.5rem;
+  margin-bottom: 1.5rem;
 }
 
 @media (min-width: 992px) {
@@ -120,6 +120,46 @@ body {
   box-shadow: 0 8px 24px var(--accent-purple-glow);
 }
 
+.header-tag-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.tc-server-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(139, 92, 246, 0.2));
+  color: #f472b6;
+  border: 1px solid rgba(236, 72, 153, 0.4);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.65rem;
+  border-radius: var(--radius-pill);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  box-shadow: 0 2px 10px rgba(236, 72, 153, 0.2);
+}
+
+.api13-current-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(59, 130, 246, 0.2));
+  color: #c084fc;
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.65rem;
+  border-radius: var(--radius-pill);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  box-shadow: 0 2px 10px rgba(139, 92, 246, 0.2);
+}
+
 .brand-title {
   font-family: var(--font-heading);
   font-size: 2.2rem;
@@ -138,6 +178,109 @@ body {
   color: var(--text-muted);
   font-size: 0.95rem;
   margin-top: 0.2rem;
+}
+
+/* Repo Meta Banner */
+.repo-meta-banner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: rgba(139, 92, 246, 0.08);
+  border: 1px solid rgba(139, 92, 246, 0.25);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 1.25rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  flex-wrap: wrap;
+}
+
+.meta-banner-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.meta-icon {
+  font-size: 1.1rem;
+  color: var(--accent-purple);
+}
+
+.repo-meta-banner code {
+  font-family: monospace;
+  background: rgba(0, 0, 0, 0.3);
+  color: #c084fc;
+  padding: 0.15rem 0.45rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  font-size: 0.82rem;
+}
+
+.meta-banner-divider {
+  width: 1px;
+  height: 16px;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Repo URL Subscription Card */
+.repo-url-card {
+  background: linear-gradient(135deg, rgba(30, 41, 69, 0.75), rgba(19, 27, 46, 0.85));
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25), 0 0 15px rgba(139, 92, 246, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.repo-url-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #c084fc;
+}
+
+.repo-url-icon {
+  font-size: 1.2rem;
+  color: var(--accent-purple);
+}
+
+.repo-url-input-group {
+  display: flex;
+  gap: 0.75rem;
+}
+
+#repo-url-input {
+  flex: 1;
+  background: rgba(11, 15, 25, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1.1rem;
+  color: #a78bfa;
+  font-family: monospace;
+  font-size: 0.92rem;
+  outline: none;
+  cursor: pointer;
+  transition: border-color var(--transition-fast);
+}
+
+#repo-url-input:focus {
+  border-color: var(--accent-purple);
+}
+
+#copy-repo-url-btn {
+  white-space: nowrap;
+  padding: 0.75rem 1.3rem;
+}
+
+#copy-repo-url-btn.copied {
+  background: linear-gradient(135deg, #10b981, #059669);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
 }
 
 /* Live Stats Bar */
