@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PluginMaster - Dalamud 外掛套件目錄</title>
+  <meta name="description" content="瀏覽與搜尋本專案收錄的所有 FFXIV Dalamud 外掛套件資訊、版本與更新日誌。">
+  <!-- Google Fonts: Inter & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Remixicon for modern icons -->
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Background Decorative Ambient Glows -->
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+
+  <!-- Main Container -->
+  <div class="app-container">
+
+    <!-- Header Section -->
+    <header class="hero-header">
+      <div class="brand">
+        <div class="brand-icon">
+          <i class="ri-puzzle-line"></i>
+        </div>
+        <div>
+          <h1 class="brand-title">PluginMaster <span>Directory</span></h1>
+          <p class="brand-subtitle">FFXIV Dalamud 外掛套件收錄總覽與檢索平台</p>
+        </div>
+      </div>
+
+      <!-- Live Stats Bar -->
+      <div class="stats-bar">
+        <div class="stat-card">
+          <span class="stat-value" id="stat-total">--</span>
+          <span class="stat-label">收錄套件總數</span>
+        </div>
+        <div class="stat-card stat-stable">
+          <span class="stat-value" id="stat-stable">--</span>
+          <span class="stat-label">Stable 穩定版</span>
+        </div>
+        <div class="stat-card stat-testing">
+          <span class="stat-value" id="stat-testing">--</span>
+          <span class="stat-label">Testing-Live 測試版</span>
+        </div>
+        <div class="stat-card stat-api">
+          <span class="stat-value" id="stat-api13">--</span>
+          <span class="stat-label">API Level 13</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Controls Section: Search & Filters -->
+    <section class="controls-section">
+      <div class="search-box">
+        <i class="ri-search-line search-icon"></i>
+        <input type="text" id="search-input" placeholder="搜尋套件名稱、作者、關鍵字或描述..." autocomplete="off">
+        <button id="clear-search" class="clear-btn hidden" title="清除搜尋"><i class="ri-close-line"></i></button>
+      </div>
+
+      <div class="filters-row">
+        <!-- Channel Tabs -->
+        <div class="filter-tabs" id="channel-tabs">
+          <button class="tab-btn active" data-channel="all">全部頻道</button>
+          <button class="tab-btn" data-channel="stable"><i class="ri-checkbox-circle-line"></i> Stable</button>
+          <button class="tab-btn" data-channel="testing-live"><i class="ri-flask-line"></i> Testing Live</button>
+        </div>
+
+        <div class="filter-dropdowns">
+          <!-- API Level Filter -->
+          <div class="select-wrapper">
+            <i class="ri-code-s-slash-line select-icon"></i>
+            <select id="api-filter">
+              <option value="all">所有 API Level</option>
+              <option value="13">API Level 13 (最新)</option>
+              <option value="12">API Level 12</option>
+              <option value="11">API Level 11</option>
+              <option value="10">API Level 10</option>
+              <option value="legacy">API Level &le; 9</option>
+            </select>
+          </div>
+
+          <!-- Sort Filter -->
+          <div class="select-wrapper">
+            <i class="ri-sort-desc select-icon"></i>
+            <select id="sort-select">
+              <option value="name-asc">名稱排序 (A &rarr; Z)</option>
+              <option value="name-desc">名稱排序 (Z &rarr; A)</option>
+              <option value="updated-desc">最新更新日期</option>
+              <option value="api-desc">API Level (高 &rarr; 低)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Results Counter -->
+    <div class="results-meta">
+      <span>顯示 <strong id="visible-count">0</strong> 個符合條件的套件</span>
+    </div>
+
+    <!-- Plugin Grid Container -->
+    <section class="plugins-grid" id="plugins-grid">
+      <!-- Skeleton Loading State -->
+      <div class="skeleton-card"></div>
+      <div class="skeleton-card"></div>
+      <div class="skeleton-card"></div>
+      <div class="skeleton-card"></div>
+      <div class="skeleton-card"></div>
+      <div class="skeleton-card"></div>
+    </section>
+
+    <!-- Empty State -->
+    <div class="empty-state hidden" id="empty-state">
+      <i class="ri-search-eye-line empty-icon"></i>
+      <h3>找不到符合條件的套件</h3>
+      <p>請嘗試使用不同的關鍵字或調整篩選條件</p>
+      <button class="btn btn-secondary" id="reset-filters-btn">重設所有篩選</button>
+    </div>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>PluginMaster Web Directory &copy; 2026 Dalamud Plugin Distribution Project</p>
+      <p class="footer-note">最後資料同步更新於專案 pluginmaster.json 檔案</p>
+    </footer>
+
+  </div>
+
+  <!-- Plugin Detail Modal -->
+  <div class="modal-overlay hidden" id="detail-modal">
+    <div class="modal-card">
+      <button class="modal-close" id="modal-close-btn" title="關閉視窗"><i class="ri-close-line"></i></button>
+
+      <div class="modal-header">
+        <div class="modal-icon-wrapper" id="modal-icon-container">
+          <i class="ri-puzzle-2-line"></i>
+        </div>
+        <div>
+          <div class="modal-badges" id="modal-badges"></div>
+          <h2 class="modal-title" id="modal-name">套件名稱</h2>
+          <p class="modal-author" id="modal-author">作者：<span>--</span></p>
+        </div>
+      </div>
+
+      <div class="modal-body">
+        <p class="modal-punchline" id="modal-punchline"></p>
+
+        <div class="modal-section">
+          <h4><i class="ri-information-line"></i> 套件簡介</h4>
+          <div class="modal-text" id="modal-description"></div>
+        </div>
+
+        <div class="modal-section" id="modal-changelog-sec">
+          <h4><i class="ri-history-line"></i> 最新更新日誌 (Changelog)</h4>
+          <div class="changelog-box" id="modal-changelog">無更新紀錄</div>
+        </div>
+
+        <div class="modal-section hidden" id="modal-testing-changelog-sec">
+          <h4><i class="ri-flask-line"></i> 測試版更新日誌 (Testing Changelog)</h4>
+          <div class="changelog-box testing" id="modal-testing-changelog">無測試更新紀錄</div>
+        </div>
+
+        <!-- Meta Table -->
+        <div class="modal-section">
+          <h4><i class="ri-file-list-3-line"></i> 套件詳細資訊</h4>
+          <div class="meta-grid">
+            <div class="meta-item">
+              <span class="meta-label">Internal Name</span>
+              <span class="meta-val" id="modal-internal-name">--</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">Assembly Version</span>
+              <span class="meta-val" id="modal-version">--</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">Dalamud API Level</span>
+              <span class="meta-val" id="modal-api-level">--</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">最後更新時間</span>
+              <span class="meta-val" id="modal-updated">--</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <a href="#" target="_blank" rel="noopener noreferrer" class="btn btn-secondary hidden" id="modal-repo-btn">
+          <i class="ri-github-line"></i> 原始碼倉庫
+        </a>
+        <button class="btn btn-primary" id="modal-copy-link">
+          <i class="ri-file-copy-line"></i> 複製套件 JSON 連結
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
