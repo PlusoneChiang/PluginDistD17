@@ -35,12 +35,26 @@ if [ -z "$JSON_FILES" ]; then
   exit 0
 fi
 
-# Extract git commit metadata
-GIT_COMMIT_HASH=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
-GIT_COMMIT_FULL=$(git rev-parse HEAD 2>/dev/null || echo "unknown")
-GIT_COMMIT_DATE=$(git log -1 --format="%ci" 2>/dev/null || echo "unknown")
+# Extract git commit metadata (handles local vs GitHub Actions CI environment)
+if [ -n "$GITHUB_SHA" ]; then
+  GIT_COMMIT_FULL="$GITHUB_SHA"
+  GIT_COMMIT_HASH=$(echo "$GITHUB_SHA" | cut -c1-8)
+  GIT_COMMIT_DATE=$(git log -1 --format="%ci" "$GITHUB_SHA" 2>/dev/null || date -u +"%Y-%m-%d %H:%M:%S +0000")
+else
+  GIT_COMMIT_HASH=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+  GIT_COMMIT_FULL=$(git rev-parse HEAD 2>/dev/null || echo "unknown")
+  GIT_COMMIT_DATE=$(git log -1 --format="%ci" 2>/dev/null || echo "unknown")
+fi
+
 DIST_COMMIT=$(git log --grep="Update distribute" -1 --format="%s" 2>/dev/null | grep -oE "[0-9a-f]{40}" || echo "")
 DIST_DATE=$(git log --grep="Update distribute" -1 --format="%ci" 2>/dev/null || echo "")
+
+# Extract GitHub Repo Slug and Branch for Download URLs
+REMOTE_URL=$(git config --get remote.origin.url 2>/dev/null || echo "")
+REPO_SLUG=$(echo "$REMOTE_URL" | sed -E 's/.*github\.com[:\/]([^\/]+\/[^\/\.]+)(\.git)?/\1/')
+[ -z "$REPO_SLUG" ] && REPO_SLUG="PlusoneChiang/PluginDistD17"
+BRANCH="tc/main"
+RAW_BASE="https://raw.githubusercontent.com/$REPO_SLUG/$BRANCH"
 
 # Generate meta.json
 cat <<EOF > "$META_FILE"
@@ -49,12 +63,14 @@ cat <<EOF > "$META_FILE"
   "commit_full": "$GIT_COMMIT_FULL",
   "commit_date": "$GIT_COMMIT_DATE",
   "upstream_dist_hash": "$DIST_COMMIT",
-  "upstream_dist_date": "$DIST_DATE"
+  "upstream_dist_date": "$DIST_DATE",
+  "repo_slug": "$REPO_SLUG",
+  "branch": "$BRANCH"
 }
 EOF
 
 # Execute single-pass jq aggregation for repo.json
-jq -s '
+jq -s --arg raw_base "$RAW_BASE" '
   def parse_ts(str):
     if str == null then 0
     else (str | sub("\\..*"; "") | sub("\\+.*"; "") | sub("Z$"; "") + "Z" | fromdateiso8601? // 0)
@@ -99,6 +115,11 @@ jq -s '
 
     (parse_ts($s_ts // $t_ts)) as $last_update |
 
+    # Download Links
+    (if $s != null then ($raw_base + "/stable/" + $iname + "/latest.zip") else ($raw_base + "/testing-live/" + $iname + "/latest.zip") end) as $dl_install |
+    (if $s != null then ($raw_base + "/stable/" + $iname + "/latest.zip") else ($raw_base + "/testing-live/" + $iname + "/latest.zip") end) as $dl_update |
+    (if $t != null then ($raw_base + "/testing-live/" + $iname + "/latest.zip") else ($raw_base + "/stable/" + $iname + "/latest.zip") end) as $dl_testing |
+
     {
       Author: ($base.Author // ""),
       Name: ($base.Name // $iname),
@@ -119,9 +140,9 @@ jq -s '
       TestingDalamudApiLevel: (if $t != null then ($t.DalamudApiLevel // 0) else null end),
       DownloadCount: ($base.DownloadCount // 0),
       LastUpdate: $last_update,
-      DownloadLinkInstall: ("https://kamori.goats.dev/Plugin/Download/" + $iname + "?isUpdate=False&isTesting=False&branch=api9&isDip17=True"),
-      DownloadLinkUpdate: ("https://raw.githubusercontent.com/goatcorp/DalamudPlugins/api9/plugins/" + $iname + "/latest.zip"),
-      DownloadLinkTesting: ("https://kamori.goats.dev/Plugin/Download/" + $iname + "?isUpdate=False&isTesting=True&branch=api9&isDip17=True"),
+      DownloadLinkInstall: $dl_install,
+      DownloadLinkUpdate: $dl_update,
+      DownloadLinkTesting: $dl_testing,
       LoadPriority: ($base.LoadPriority // 0),
       ImageUrls: ($base.ImageUrls // null),
       IconUrl: ($base.IconUrl // null),
